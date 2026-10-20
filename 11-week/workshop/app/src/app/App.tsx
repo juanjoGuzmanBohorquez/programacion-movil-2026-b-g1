@@ -1,3 +1,4 @@
+import { useCallback, useRef, useState } from 'react';
 import {
   IonApp,
   IonRouterOutlet,
@@ -8,6 +9,9 @@ import {
   IonContent,
   IonButtons,
   IonBackButton,
+  IonRefresher,
+  IonRefresherContent,
+  type RefresherEventDetail,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route, useParams } from 'react-router-dom';
@@ -37,6 +41,14 @@ const sessions = [
 ];
 
 function SessionsPage() {
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const pendingRefresh = useRef<RefresherEventDetail | null>(null);
+
+  const finishRefresh = useCallback(() => {
+    pendingRefresh.current?.complete();
+    pendingRefresh.current = null;
+  }, []);
+
   return (
     <IonPage>
       <IonHeader>
@@ -46,12 +58,29 @@ function SessionsPage() {
       </IonHeader>
 
       <IonContent>
+        <IonRefresher
+          slot="fixed"
+          onIonRefresh={event => {
+            pendingRefresh.current = event.detail;
+            setRefreshVersion(value => value + 1);
+          }}
+        >
+          <IonRefresherContent
+            pullingText="Desliza para actualizar sesiones"
+            refreshingText="Actualizando sesiones…"
+          />
+        </IonRefresher>
+
         <main className="workshop-content">
           <h1>Sesiones de clase</h1>
           <p>Selecciona la sesión para consultar su código QR.</p>
           <p>Vista de demostración con sesiones de ejemplo.</p>
 
-          <SessionList sessions={sessions} />
+          <SessionList
+            sessions={sessions}
+            refreshVersion={refreshVersion}
+            onSettled={finishRefresh}
+          />
         </main>
       </IonContent>
     </IonPage>
@@ -82,7 +111,6 @@ function SessionQrPage() {
               <p>
                 Sesión {session.id} · {session.date} · {session.time}
               </p>
-
               <section aria-labelledby="qr-heading">
                 <h2 id="qr-heading">Registro de asistencia</h2>
                 <p>

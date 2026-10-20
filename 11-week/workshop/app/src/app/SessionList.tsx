@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
-  IonButton, IonItem, IonLabel, IonList, IonSkeletonText,
+  IonButton,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonSkeletonText,
 } from '@ionic/react';
 
 type Session = {
@@ -12,20 +16,32 @@ type Session = {
 
 type Props = {
   sessions: Session[];
+  refreshVersion?: number;
+  onSettled?: () => void;
 };
 
-export default function SessionList({ sessions }: Props) {
-  const [status, setStatus] = useState('loading');
+type LoadStatus = 'loading' | 'error' | 'ready';
+
+export default function SessionList({
+  sessions,
+  refreshVersion = 0,
+  onSettled,
+}: Props) {
+  const [status, setStatus] = useState<LoadStatus>('loading');
   const [attempt, setAttempt] = useState(0);
+
   const mode = new URLSearchParams(window.location.search).get('estado');
 
   useEffect(() => {
     setStatus('loading');
+
     const timer = window.setTimeout(() => {
       setStatus(mode === 'error' && attempt === 0 ? 'error' : 'ready');
+      onSettled?.();
     }, 1500);
+
     return () => window.clearTimeout(timer);
-  }, [attempt, mode]);
+  }, [attempt, mode, refreshVersion, onSettled]);
 
   if (status === 'loading') {
     return (
@@ -35,6 +51,7 @@ export default function SessionList({ sessions }: Props) {
           <IonSkeletonText
             key={item}
             animated
+            aria-hidden="true"
             style={{ width: '100%', height: '4rem' }}
           />
         ))}
@@ -54,11 +71,17 @@ export default function SessionList({ sessions }: Props) {
     );
   }
 
-  if (mode === 'vacio') {
+  const visibleSessions = mode === 'vacio' ? [] : sessions;
+
+  if (visibleSessions.length === 0) {
     return (
       <section aria-labelledby="empty-title">
         <h2 id="empty-title">No hay sesiones para mostrar</h2>
-        <p>Esta vista simula un curso sin clases registradas.</p>
+        <p>
+          {mode === 'vacio'
+            ? 'Esta vista simula un curso sin clases registradas.'
+            : 'Todavía no hay clases registradas en esta lista.'}
+        </p>
         <IonButton href="/sesiones">
           Ver sesiones de ejemplo
         </IonButton>
@@ -68,7 +91,7 @@ export default function SessionList({ sessions }: Props) {
 
   return (
     <IonList aria-label="Sesiones de clase">
-      {sessions.map(session => (
+      {visibleSessions.map(session => (
         <IonItem
           key={session.id}
           routerLink={`/sesiones/${session.id}/qr`}
