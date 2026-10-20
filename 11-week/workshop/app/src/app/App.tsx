@@ -7,16 +7,20 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
+  IonButton,
   IonButtons,
   IonBackButton,
   IonRefresher,
   IonRefresherContent,
+  useIonViewWillEnter,
   type RefresherEventDetail,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route, useParams } from 'react-router-dom';
 
 import SessionList from './SessionList';
+import SessionFormPage from './SessionFormPage';
+import { getSessions } from './session-store';
 
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
@@ -25,24 +29,14 @@ import '@ionic/react/css/typography.css';
 import '@ionic/react/css/padding.css';
 import './theme/variables.css';
 
-const sessions = [
-  {
-    id: '101',
-    course: 'Programación Móvil',
-    date: '19/10/2026',
-    time: '18:30',
-  },
-  {
-    id: '102',
-    course: 'Programación Móvil',
-    date: '26/10/2026',
-    time: '18:30',
-  },
-];
-
 function SessionsPage() {
+  const [sessions, setSessions] = useState(getSessions);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const pendingRefresh = useRef<RefresherEventDetail | null>(null);
+
+  useIonViewWillEnter(() => {
+    setSessions(getSessions());
+  });
 
   const finishRefresh = useCallback(() => {
     pendingRefresh.current?.complete();
@@ -62,6 +56,7 @@ function SessionsPage() {
           slot="fixed"
           onIonRefresh={event => {
             pendingRefresh.current = event.detail;
+            setSessions(getSessions());
             setRefreshVersion(value => value + 1);
           }}
         >
@@ -74,7 +69,11 @@ function SessionsPage() {
         <main className="workshop-content">
           <h1>Sesiones de clase</h1>
           <p>Selecciona la sesión para consultar su código QR.</p>
-          <p>Vista de demostración con sesiones de ejemplo.</p>
+          <p>Demostración con datos guardados en este navegador.</p>
+
+          <IonButton routerLink="/sesiones/nueva">
+            Crear sesión
+          </IonButton>
 
           <SessionList
             sessions={sessions}
@@ -89,7 +88,7 @@ function SessionsPage() {
 
 function SessionQrPage() {
   const { id } = useParams<{ id: string }>();
-  const session = sessions.find(item => item.id === id);
+  const session = getSessions().find(item => item.id === id);
 
   return (
     <IonPage>
@@ -133,6 +132,11 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
+        <Route
+          exact
+          path="/sesiones/nueva"
+          component={SessionFormPage}
+        />
         <Route exact path="/sesiones" component={SessionsPage} />
         <Route
           exact
