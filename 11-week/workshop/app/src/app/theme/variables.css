@@ -1,37 +1,52 @@
-:root {
-  --ion-color-primary: #166534;
-  --ion-color-primary-rgb: 22, 101, 52;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #13592e;
-  --ion-color-primary-tint: #2d7448;
-  --ion-color-secondary: #334155;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-success: #166534;
-  --ion-color-success-contrast: #ffffff;
-  --ion-color-danger: #b91c1c;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-background-color: #f8fafc;
-  --ion-text-color: #0f172a;
-  --font-body: 1rem;
-  --font-heading: 1.5rem;
-  --space-small: 0.5rem;
-  --space-medium: 1rem;
-  --space-large: 1.5rem;
+.workshop-content {
+  box-sizing: border-box;
+  width: 100%;
+  overflow-wrap: anywhere;
 }
 
-.workshop-content {
-  max-width: 48rem;
-  margin: 0 auto;
-  padding: var(--space-large);
-  font-size: var(--font-body);
+.workshop-content h2 {
+  font-size: 1.125rem;
   line-height: 1.5;
 }
 
-.workshop-content h1 {
-  font-size: var(--font-heading);
+.workshop-content ion-label p {
+  color: var(--ion-text-color);
+  font-size: var(--font-body);
+  white-space: normal;
 }
 
-ion-item {
-  --min-height: 64px;
+ion-button,
+ion-back-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+ion-button {
+  --padding-top: 0.75rem;
+  --padding-bottom: 0.75rem;
+  white-space: normal;
+  height: auto;
+}
+
+ion-button::part(native):focus-visible,
+ion-item::part(native):focus-visible {
+  outline: 3px solid var(--ion-color-primary);
+  outline-offset: 3px;
+}
+
+ion-back-button::part(native):focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: -3px;
+}
+
+@media (max-width: 400px) {
+  .workshop-content {
+    padding: var(--space-medium);
+  }
+}
+
+@media (min-width: 768px) {
+  .workshop-content {
+    padding: 2rem;
+  }
 }
