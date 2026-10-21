@@ -53,3 +53,22 @@ No individual task timings were collected.
 ## Correction status
 
 The interface correction and its verification are pending.
+
+## Implemented correction
+
+The session list now explicitly explains that created sessions are
+available only in the current browser and application address.
+It also states that sessions are not shared across browsers or devices
+and that server synchronization is not available.
+
+This replaces the pending implementation status above.
+The change clarifies storage behavior; it does not add synchronization.
+
+## Verification
+
+- Production build: passed.
+- Existing session list retry test: 1 passed.
+- Screenshot captured by the student.
+- Participant comprehension after the change: not yet verified.
+
+![Local storage explanation](img/after-storage-notice.png)

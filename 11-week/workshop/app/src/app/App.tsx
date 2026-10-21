@@ -67,11 +67,25 @@ function SessionsPage() {
 
         <main className="workshop-content">
           <h1>Sesiones de clase</h1>
-          <p>Selecciona la sesión para consultar su código QR.</p>
-          <p>Demostración con datos guardados en este navegador.</p>
+          <p>Selecciona la sesión para consultar sus datos y el estado del QR.</p>
+
+          <section aria-labelledby="storage-heading">
+            <h2 id="storage-heading">Demostración con guardado local</h2>
+            <p>
+              Las sesiones que crees solo estarán disponibles en este
+              navegador. No se comparten con otros navegadores ni dispositivos.
+            </p>
+            <p>
+              Para volver a consultarlas, utiliza el mismo navegador y
+              la misma dirección de la aplicación.
+            </p>
+            <p>La sincronización con el servidor todavía no está disponible.</p>
+          </section>
+
           <IonButton routerLink="/sesiones/nueva">
             Crear sesión
           </IonButton>
+
           <SessionList
             sessions={sessions}
             refreshVersion={refreshVersion}
