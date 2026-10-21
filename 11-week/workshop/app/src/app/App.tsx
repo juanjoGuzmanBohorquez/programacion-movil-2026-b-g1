@@ -8,18 +8,17 @@ import {
   IonTitle,
   IonContent,
   IonButton,
-  IonButtons,
-  IonBackButton,
   IonRefresher,
   IonRefresherContent,
   useIonViewWillEnter,
   type RefresherEventDetail,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route, useParams } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
 import SessionList from './SessionList';
 import SessionFormPage from './SessionFormPage';
+import SessionQrPage from './SessionQrPage';
 import { getSessions } from './session-store';
 
 import '@ionic/react/css/core.css';
@@ -70,11 +69,9 @@ function SessionsPage() {
           <h1>Sesiones de clase</h1>
           <p>Selecciona la sesión para consultar su código QR.</p>
           <p>Demostración con datos guardados en este navegador.</p>
-
           <IonButton routerLink="/sesiones/nueva">
             Crear sesión
           </IonButton>
-
           <SessionList
             sessions={sessions}
             refreshVersion={refreshVersion}
@@ -86,62 +83,18 @@ function SessionsPage() {
   );
 }
 
-function SessionQrPage() {
-  const { id } = useParams<{ id: string }>();
-  const session = getSessions().find(item => item.id === id);
-
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar color="primary">
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/sesiones" text="Sesiones" />
-          </IonButtons>
-          <IonTitle>QR de la sesión</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-
-      <IonContent>
-        <main className="workshop-content">
-          <h1>{session?.course ?? 'Sesión no encontrada'}</h1>
-
-          {session ? (
-            <>
-              <p>
-                Sesión {session.id} · {session.date} · {session.time}
-              </p>
-              <section aria-labelledby="qr-heading">
-                <h2 id="qr-heading">Registro de asistencia</h2>
-                <p>
-                  La generación del QR todavía no está conectada
-                  al backend.
-                </p>
-                <p>Regresa a Sesiones para elegir otra clase.</p>
-              </section>
-            </>
-          ) : (
-            <p>Regresa a Sesiones para seleccionar una clase disponible.</p>
-          )}
-        </main>
-      </IonContent>
-    </IonPage>
-  );
-}
-
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        <Route
-          exact
-          path="/sesiones/nueva"
-          component={SessionFormPage}
-        />
+        <Route exact path="/sesiones/nueva" component={SessionFormPage} />
         <Route exact path="/sesiones" component={SessionsPage} />
         <Route
           exact
           path="/sesiones/:id/qr"
-          component={SessionQrPage}
+          render={({ location }) => (
+            <SessionQrPage key={location.pathname + location.search} />
+          )}
         />
         <Route exact path="/">
           <Redirect to="/sesiones" />
